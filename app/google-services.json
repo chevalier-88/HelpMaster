@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "823922795291",
+    "firebase_url": "https://help-master.firebaseio.com",
+    "project_id": "help-master",
+    "storage_bucket": "help-master.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823922795291:android:c02ac55a2a417fd5",
+        "android_client_info": {
+          "package_name": "chevalier.vladimir.gmail.com.helpmaster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "823922795291-qi6aobphu83ipr037ktig62ve5crl6os.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "chevalier.vladimir.gmail.com.helpmaster",
+            "certificate_hash": "85e594dddec8a113bf2d826c694a94e8a61081de"
+          }
+        },
+        {
+          "client_id": "823922795291-v5t8rfukg7umdhgv5ende5goa3l0ikgi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "chevalier.vladimir.gmail.com.helpmaster",
+            "certificate_hash": "35b60e5054d168ecec407f47ef0a7e294257f206"
+          }
+        },
+        {
+          "client_id": "823922795291-tkvr8kt2okh57tk0uaaiarl56h54dfjs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBisOb5fw3u1Mo8gZjQhvCFe_GKpNQ3NXQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "823922795291-tkvr8kt2okh57tk0uaaiarl56h54dfjs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

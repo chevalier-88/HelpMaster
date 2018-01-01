@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_new_event"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="5dp"
+        android:columnCount="5"
+        android:orientation="horizontal">
+
+        <!--row 0, date:-->
+        <Spinner
+            android:id="@+id/id_dialog_spinner_year"
+            android:layout_width="80dp"
+            android:layout_height="40sp"
+            android:layout_column="0"
+            android:layout_row="0"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="10dp"
+            android:layout_height="40sp"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:gravity="center"
+            android:text="-" />
+
+        <Spinner
+            android:id="@+id/id_dialog_spinner_month"
+            android:layout_width="80dp"
+            android:layout_height="40sp"
+            android:layout_column="2"
+            android:layout_row="0"
+            android:entries="@array/Months"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="10dp"
+            android:layout_height="40sp"
+            android:layout_column="3"
+            android:layout_row="0"
+            android:gravity="center"
+            android:text="-" />
+
+        <Spinner
+            android:id="@+id/id_dialog_spinner_day"
+            android:layout_width="80dp"
+            android:layout_height="40sp"
+            android:layout_column="4"
+            android:layout_row="0"
+            android:gravity="center" />
+
+        <!--row 1, time: -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40sp"
+            android:layout_column="0"
+            android:layout_columnSpan="2"
+            android:layout_gravity="center"
+            android:layout_row="1"
+            android:gravity="center"
+            android:text="time:" />
+
+        <Spinner
+            android:id="@+id/id_dialog_spinner_hour"
+            android:layout_width="80dp"
+            android:layout_height="40sp"
+            android:layout_column="2"
+            android:layout_row="1"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="10dp"
+            android:layout_height="40sp"
+            android:layout_column="3"
+            android:layout_row="1"
+            android:gravity="center"
+            android:text=":" />
+
+        <Spinner
+            android:id="@+id/id_dialog_spinner_minutes"
+            android:layout_width="80dp"
+            android:layout_height="40sp"
+            android:layout_column="4"
+            android:layout_row="1"
+            android:gravity="center" />
+
+    </GridLayout>
+    <!--row 2, consumer:-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <!--<EditText-->
+        <!--android:id="@+id/id_dialog_client_name"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="40sp"-->
+
+        <!--android:layout_marginLeft="15dp"-->
+        <!--android:layout_marginRight="15dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_weight="0.6"-->
+
+        <!--android:hint="client name" />-->
+        <AutoCompleteTextView
+            android:id="@+id/id_dialog_client_name"
+            android:layout_width="wrap_content"
+            android:layout_height="40sp"
+
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="0.6"
+
+            android:hint="client name" />
+        <!--android:layout_column="1"-->
+        <!--android:layout_columnSpan="2"-->
+        <!--android:layout_row="2"-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_weight="0.2"
+            android:gravity="center"
+            android:text="disc:" />
+
+        <EditText
+            android:id="@+id/id_dialog_et_discount"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="0.2"
+            android:gravity="center" />
+        <!--android:text="@string/vl_discount"-->
+    </LinearLayout>
+    <!--row 3, staff name: -->
+    <EditText
+        android:id="@+id/id_dialog_et_phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="40sp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp"
+        android:hint="@string/dialog_hint_phone_number"
+        android:inputType="text"
+        android:lines="1" />
+
+    <EditText
+        android:id="@+id/id_dialog_staff_name"
+        android:layout_width="match_parent"
+        android:layout_height="40sp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp"
+        android:hint="@string/staff_name"
+        android:inputType="text"
+        android:lines="1" />
+    <!--android:layout_row="3"-->
+    <!--row 4, service: -->
+    <Spinner
+        android:id="@+id/id_dialog_spinner_service"
+        android:layout_width="match_parent"
+        android:layout_height="40sp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center" />
+    <!--row 5, button:-->
+
+    <Button
+        android:id="@+id/id_dialog_event_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="40dp"
+        android:gravity="center"
+        android:text="add" />
+
+</LinearLayout>

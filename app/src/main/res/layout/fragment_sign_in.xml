@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="@color/colorPrimary"-->
+    <!--android:orientation="vertical">-->
+
+    <ImageView
+        android:id="@+id/id_s_i_img_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/logo" />
+
+    <LinearLayout
+        android:id="@+id/id_s_i_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:alpha="0.0"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/id_s_i_sign_in"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@drawable/selector_edit_text_style"
+            android:gravity="center"
+            android:hint="@string/e_t_e_mail"
+            android:inputType="textEmailAddress"
+            android:lines="1"
+            android:textSize="24sp" />
+
+        <EditText
+            android:id="@+id/id_s_i_e_t_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@drawable/selector_edit_text_style"
+            android:gravity="center"
+            android:hint="@string/e_t_password"
+            android:inputType="text"
+            android:lines="1"
+            android:textSize="24sp" />
+        <!--android:inputType="textPassword"-->
+
+        <Button
+            android:id="@+id/id_s_i_btn_signin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@drawable/selector_btn_style"
+            android:text="@string/btn_sign_in" />
+    </LinearLayout>
+    <!--</LinearLayout>-->
+</FrameLayout>

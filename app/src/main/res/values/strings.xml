@@ -1,0 +1,142 @@
+<resources>
+    <string name="app_name">Help Master</string>
+    <string name="title_home_activity">Main2Activity</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+
+    <!--string values for edit text fields:-->
+    <string name="e_t_name">name</string>
+    <string name="e_t_sername">surname</string>
+    <string name="e_t_phone">phone</string>
+    <string name="e_t_e_mail">E-mail</string>
+    <string name="e_t_password">password</string>
+    <string name="e_t_confirm_password">confirm password</string>
+    <string name="btn_registration">registration</string>
+    <string name="btn_sign_in">sign in</string>
+    <string name="btn_add">add</string>
+    <string name="btn_update">update</string>
+
+
+    <!--valies for db: -->
+    <string name="database_name">help_master.db</string>
+    <string name="single_table111">contacts</string>
+    <integer name="db_version">1</integer>
+    <!--sql comands: -->
+
+    <string name="create_table_userapp">"CREATE TABLE IF NOT EXISTS userapp (_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, surname  TEXT NOT NULL, phone TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL);"</string>
+    <string name="table_userapp">userapp</string>
+    <string name="userapp_column_id">_id</string>
+    <string name="userapp_column_name">name</string>
+    <string name="userapp_column_surname">surname</string>
+    <string name="userapp_column_phone">phone</string>
+    <string name="userapp_column_email">email</string>
+    <string name="userapp_column_password">password</string>
+    <string name="create_table_services">"CREATE TABLE IF NOT EXISTS services (_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, duration INTEGER NOT NULL, cost INTEGER NOT NULL, first_cost REAL NOT NULL, description TEXT NOT NULL DEFAULT \'--\');"</string>
+    <string name="table_services">services</string>
+    <string name="services_id">_id</string>
+    <string name="services_column_name">name</string>
+    <string name="services_column_duration">duration</string>
+    <string name="services_column_cost">cost</string>
+    <string name="services_column_first_cost">first_cost</string>
+    <string name="services_column_description">description</string>
+
+    <string name="create_table_reg_consumers">"CREATE TABLE IF NOT EXISTS consumers (_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, surname TEXT NOT NULL, photo TEXT DEFAULT \'—\', phone_number TEXT DEFAULT \'-\',balans REAL DEFAULT 0.0, discount INTEGER DEFAULT 0, description TEXT DEFAULT \'--\');"</string>
+    <string name="table_consumers">consumers</string>
+    <string name="consumer_column_id">_id</string>
+    <string name="consumer_column_name">name</string>
+    <string name="consumer_column_surname">surname</string>
+    <string name="consumer_column_photo">photo</string>
+    <string name="consumer_column_phone_number">phone_number</string>
+    <string name="consumer_column_balans">balans</string>
+    <string name="consumer_column_discount">discount</string>
+    <string name="consumer_column_description">description</string>
+    <!--<string name="create_table_events">"CREATE TABLE IF NOT EXISTS events (_id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, consumer TEXT NOT NULL, id_userapp INTEGER NOT NULL, id_service INTEGER NOT NULL, discount INTEGER NOT NULL);"</string>-->
+    <string name="create_table_events">"CREATE TABLE IF NOT EXISTS events (_id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, consumer TEXT NOT NULL, userapp TEXT NOT NULL, id_service INTEGER NOT NULL, discount INTEGER NOT NULL, phone TEXT DEFAULT \'-\');"</string>
+    <string name="table_events">events</string>
+    <string name="events_column_id">_id</string>
+    <string name="events_column_date">date</string>
+    <string name="events_column_consumer">consumer</string>
+    <!--<string name="events_column_id_userapp">id_userapp</string>-->
+    <string name="events_column_id_userapp">userapp</string>
+    <string name="events_column_id_service">id_service</string>
+    <string name="events_column_discount">discount</string>
+    <string name="events_column_phone_number">phone</string>
+    <!-- new testing table for synchronisation:-->
+
+    <string name="delete_table_synchronization">"DROP TABLE IF EXISTS synchronization;"</string>
+    <string name="create_table_synchronization">"CREATE TABLE IF NOT EXISTS synchronization (_id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, username  TEXT NOT NULL, tablename TEXT NOT NULL);"</string>
+    <string name="table_synchronization">synchronization</string>
+    <string name="synchronization_column_id">_id</string>
+    <string name="synchronization_column_date">date</string>
+    <string name="synchronization_column_username">username</string>
+    <string name="synchronization_column_table">tablename</string>
+    <!---->
+    <string name="nav_events">Events</string>
+    <string name="nav_services">Services</string>
+    <string name="nav_consumers">Consumers</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_about">About</string>
+    <string name="nav_communicate">Communicate</string>
+    <string name="nav_employees">Employees</string>
+    <string name="vl_discount">0</string>
+    <string name="select_service">select service</string>
+    <string name="msg_no_correct_fields">Check your field and try again</string>
+
+    <string-array name="position_list">
+        <item>select post</item>
+        <item>masseur</item>
+        <item>beautician</item>
+        <item>aqua-masseur</item>
+    </string-array>
+    <string-array name="Months">
+        <item>month</item>
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <!--string values for dialog consumer:-->
+    <string name="consumer_dialog_default_img_path">"/drawable/item"</string>
+    <string name="consumer_dialog_default_balance">0.0</string>
+    <string name="consumer_dialog_default_discount">0</string>
+    <string name="consumer_dialog_default_description">"don\'t have information"</string>
+
+    <!--<string name="create_table_staff">"CREATE TABLE IF NOT EXISTS staff (_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, surname TEXT NOT NULL, position TEXT NOT NULL, photo TEXT NOT NULL DEFAULT \'&#45;&#45;\');"</string>-->
+    <!--<string name="table_staff">staff</string>-->
+    <!--<string name="staff_column_id">_id</string>-->
+    <!--<string name="staff_column_name">name</string>-->
+    <!--<string name="staff_column_surname">surname</string>-->
+    <!--<string name="staff_column_position">position</string>-->
+    <!--<string name="staff_column_photo">photo</string>-->
+    <string name="alignment">alignment</string>
+    <string name="direction">direction</string>
+    <string name="dialog_consumer_hint_balance">balance</string>
+    <string name="dialog_consumer_hint_name">name</string>
+    <string name="dialog_consumer_hint_surname">surname</string>
+    <string name="dialog_consumer_hint_discount">discount</string>
+    <string name="dialog_consumer_hint_description">description</string>
+    <string name="id_dialog_service_btn_add">Add</string>
+    <string name="btn_fragment_employee_set_change">set change</string>
+    <string name="nav_salary">Salary</string>
+    <!--<string name="formula_percente">"?*(1-?/100)"</string>-->
+    <string name="dialog_hint_phone_number">+380 phone number</string>
+    <string name="staff_name">staff name</string>
+    <string name="select_app_for_call">select aplication for call:</string>
+    <string name="str_name_autor">Chevalier Vladimir</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
+
+    <!---->
