@@ -1,13 +1,9 @@
 package chevalier.vladimir.gmail.com.helpmaster.utils;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -16,9 +12,6 @@ import java.util.List;
 import chevalier.vladimir.gmail.com.helpmaster.R;
 import chevalier.vladimir.gmail.com.helpmaster.entities.SalaryItem;
 
-/**
- * Created by chevalier on 21.09.17.
- */
 
 public class SalaryItemAdapter extends BaseAdapter {
 
@@ -47,13 +40,11 @@ public class SalaryItemAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        // menu type count
         return 3;
     }
 
     @Override
     public int getItemViewType(int position) {
-        // current menu type
         return position % 3;
     }
 
@@ -83,10 +74,18 @@ public class SalaryItemAdapter extends BaseAdapter {
         SalaryHolder holder = (SalaryHolder) convertView.getTag();
         SalaryItem item = getItem(position);
 
-        holder.tvDate.setText(item.getDate().split("_")[0] + "\n" + item.getDate().split("_")[1]);
+        String eventDate = item.getDate().split(" ")[0];
+        String dateMod = eventDate.split("-")[0] + "-" + context.getResources().getStringArray(R.array.Months)[Integer.parseInt(eventDate.split("-")[1])] + "-" + eventDate.split("-")[2] + " " + "\n" + item.getDate().split(" ")[1];
+
+        holder.tvDate.setText(dateMod);
         holder.tvService.setText(item.getServiceName());
         holder.tvConsumerName.setText(item.getConsumerName());
         holder.tvCost.setText("" + item.getSum());
+        if ((position % 2) != 0) {
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.item_even_background));
+        } else {
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.item_not_even_background));
+        }
 
         return convertView;
     }

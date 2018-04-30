@@ -8,19 +8,10 @@ public class SalaryItem {
     public SalaryItem() {
     }
 
-//    private int idItem;
     private String date;
     private String serviceName;
     private String consumerName;
     private Double sum;
-
-//    public int getIdItem() {
-//        return idItem;
-//    }
-
-//    public void setIdItem(int idItem) {
-//        this.idItem = idItem;
-//    }
 
     public String getDate() {
         return date;
@@ -52,5 +43,37 @@ public class SalaryItem {
 
     public void setSum(Double sum) {
         this.sum = sum;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SalaryItem that = (SalaryItem) o;
+
+        if (!date.equals(that.date)) return false;
+        if (!serviceName.equals(that.serviceName)) return false;
+        if (!consumerName.equals(that.consumerName)) return false;
+        return sum.equals(that.sum);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = date.hashCode();
+        result = 31 * result + serviceName.hashCode();
+        result = 31 * result + consumerName.hashCode();
+        result = 31 * result + sum.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "SalaryItem{" +
+                "date='" + date + '\'' +
+                ", serviceName='" + serviceName + '\'' +
+                ", consumerName='" + consumerName + '\'' +
+                ", sum=" + sum +
+                '}';
     }
 }

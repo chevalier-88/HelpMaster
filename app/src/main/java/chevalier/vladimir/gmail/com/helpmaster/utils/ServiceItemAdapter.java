@@ -12,9 +12,6 @@ import java.util.List;
 import chevalier.vladimir.gmail.com.helpmaster.R;
 import chevalier.vladimir.gmail.com.helpmaster.entities.Service;
 
-/**
- * Created by chevalier on 02.09.17.
- */
 
 public class ServiceItemAdapter extends BaseAdapter {
 
@@ -57,13 +54,11 @@ public class ServiceItemAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        // menu type count
         return 3;
     }
 
     @Override
     public int getItemViewType(int position) {
-        // current menu type
         return position % 3;
     }
 
@@ -82,6 +77,11 @@ public class ServiceItemAdapter extends BaseAdapter {
         holder.nameService.setText(item.getNameService());
         holder.durationService.setText("" + item.getDurationService());
         holder.costService.setText("" + item.getCostService());
+        if ((position % 2) != 0) {
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.item_even_background));
+        } else {
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.item_not_even_background));
+        }
 
         return convertView;
     }

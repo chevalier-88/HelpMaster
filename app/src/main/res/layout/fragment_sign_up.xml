@@ -14,9 +14,8 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="30dp"
         android:gravity="center"
-        android:hint="name"
+        android:hint="@string/e_t_name"
         android:inputType="textCapWords" />
-    <!--android:hint="@string/e_t_name"-->
 
     <EditText
         android:id="@+id/id_s_up_surname"

@@ -52,13 +52,11 @@ public class EventItemAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        // menu type count
         return 3;
     }
 
     @Override
     public int getItemViewType(int position) {
-        // current menu type
         return position % 3;
     }
 
@@ -71,48 +69,18 @@ public class EventItemAdapter extends BaseAdapter {
         }
         ViewHolder holder = (ViewHolder) convertView.getTag();
         EventItem item = getItem(position);
-        holder.tvDate.setText(item.getDate());
+
+        String eventDate = item.getDate().split(" ")[0];
+        String dateMod = eventDate.split("-")[0] + "-" + context.getResources().getStringArray(R.array.Months)[Integer.parseInt(eventDate.split("-")[1])] + "-" + eventDate.split("-")[2] + " " + item.getDate().split(" ")[1];
+
+        holder.tvDate.setText(dateMod);
         holder.tvService.setText(item.getService());
         holder.tvCostumer.setText(item.getConsumer());
-
+        if ((position % 2) != 0) {
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.item_even_background));
+        } else {
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.item_not_even_background));
+        }
         return convertView;
     }
-
-//    @NonNull
-//    @Override
-//    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-//        EventHolder holder;
-//
-//        String date = this.getItem(position).getDate();
-//        String service = this.getItem(position).getService();
-//        String consumer = this.getItem(position).getConsumer();
-//
-//        LayoutInflater inflater = LayoutInflater.from(context);
-//        convertView = inflater.inflate(resource, parent, false);
-//
-//
-//        holder = new EventHolder();
-//
-//        holder.tvDate = (TextView) convertView.findViewById(R.id.id_cie_date);
-//        holder.tvService = (TextView) convertView.findViewById(R.id.id_cie_service);
-//        holder.tvCostumer = (TextView) convertView.findViewById(R.id.id_cie_consumer);
-//
-//
-//        holder.tvDate.setText(date);
-//        holder.tvService.setText(service);
-//        holder.tvCostumer.setText(consumer);
-//
-//        return convertView;
-//    }
-
 }
-
-
-
-
-
-
-
-
-
-

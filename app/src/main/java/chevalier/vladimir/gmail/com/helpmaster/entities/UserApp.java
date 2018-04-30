@@ -1,10 +1,12 @@
 package chevalier.vladimir.gmail.com.helpmaster.entities;
 
+import java.io.Serializable;
+
 /**
  * Created by chevalier on 30.07.17.
  */
 
-public class UserApp {
+public class UserApp implements Serializable {
     public UserApp() {
     }
 
@@ -13,6 +15,7 @@ public class UserApp {
     private String phone;
     private String Email;
     private String password;
+    private String imgPath;
 
     public String getName() {
         return name;
@@ -52,5 +55,24 @@ public class UserApp {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
+    @Override
+    public String toString() {
+        return "UserApp{" +
+                "name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", phone='" + phone + '\'' +
+                ", Email='" + Email + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

@@ -45,7 +45,7 @@
             android:layout_gravity="center"
             android:layout_weight="24"
             android:gravity="center"
-            android:text="balance: "
+            android:text="@string/consumer_balance"
             android:textStyle="italic" />
 
         <TextView
@@ -67,7 +67,7 @@
             android:layout_gravity="center"
             android:layout_weight="24"
             android:gravity="center"
-            android:text="discount: "
+            android:text="@string/tv_discount"
             android:textStyle="italic" />
 
         <TextView

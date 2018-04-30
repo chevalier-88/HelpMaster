@@ -1,86 +1,82 @@
 package chevalier.vladimir.gmail.com.helpmaster.ui;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import chevalier.vladimir.gmail.com.helpmaster.R;
-import chevalier.vladimir.gmail.com.helpmaster.entities.FlagAccess;
 import chevalier.vladimir.gmail.com.helpmaster.entities.UserApp;
-import chevalier.vladimir.gmail.com.helpmaster.utils.LocalSqliteHelper;
 
 
 public class FragmentSignIn extends Fragment {
 
-    public static final String TAG = "verify_message";
 
-    private LocalSqliteHelper localSqliteHandler;
     private LinearLayout signInForm;
     private EditText fieldMail;
     private EditText fieldPassword;
-    private Button btnSignIn;
     private ImageView imgLogo;
 
     public static final int ANIM_ITEM_DURATION = 1000;
     private static boolean status = false;
 
-    //
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-//    private FirebaseDatabase database;
-//    private DatabaseReference ref;
+    private ValueEventListener listener;
+    private UserApp userFromFirebase;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
+        listener = new ValueEventListener() {
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    //TODO
-                    Log.i(TAG, "user is exists and signIn");
-                } else {
-                    Log.i(TAG, "user is null, and ist signOut");
-                    //TODO
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (isAccessToInternet(getActivity())) {
+                    if (validationForm()) {
+                        userFromFirebase = dataSnapshot.child(getActivity().getResources().getString(R.string.branch_users)).
+                                child(fieldMail.getText().toString().trim().
+                                        replace(".", "~")).
+                                child(getActivity().getResources().getString(R.string.subbranch_personal_data)).getValue(UserApp.class);
+                    }
+                    if (fieldMail.getText().toString().trim().equals(userFromFirebase.getEmail().toString()) &&
+                            fieldPassword.getText().toString().trim().equals(userFromFirebase.getPassword().toString())) {
+
+                        Intent intent = new Intent(getActivity().getBaseContext(), HomeActivity.class);
+                        startActivity(intent);
+                        getActivity().finish();
+                    } else {
+                        fieldMail.setError(getActivity().getResources().getString(R.string.msg_no_correct_fields));
+                        fieldPassword.setError(getActivity().getResources().getString(R.string.msg_no_correct_fields));
+                    }
                 }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         };
-
-//        database = FirebaseDatabase.getInstance();
-//        ref = database.getReference();
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.i(TAG, "onCreateView");
         status = true;
-        localSqliteHandler = new LocalSqliteHelper(getActivity());
-
 
         View view = inflater.inflate(R.layout.fragment_sign_in, container, false);
 
@@ -91,53 +87,16 @@ public class FragmentSignIn extends Fragment {
         fieldMail = (EditText) view.findViewById(R.id.id_s_i_sign_in);
         fieldPassword = (EditText) view.findViewById(R.id.id_s_i_e_t_password);
 
-        btnSignIn = (Button) view.findViewById(R.id.id_s_i_btn_signin);
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
-            UserApp currentUserApp;
+        view.findViewById(R.id.id_s_i_btn_signin).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Log.i(TAG, "onClick for button");
-                if (FlagAccess.checkNetWorkAccess(getActivity())) {
-                    Log.i(TAG, "checkNetWork...");
-                    if (validationForm()){
-                        Log.i(TAG, "check form");
-                        mAuth.signInWithEmailAndPassword(fieldMail.getText().toString().trim(), fieldPassword.getText().toString().trim()).addOnCompleteListener(
-                                getActivity(), new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if (task.isSuccessful()&& ((currentUserApp = localSqliteHandler.getUserApp(fieldMail.getText().toString(), fieldPassword.getText().toString())) != null)) {
-                                            FlagAccess.NAME_USERAPP = currentUserApp.getName() + " " + currentUserApp.getSurname();
-                                            FlagAccess.MAIL_CURRENT_USERAPP = fieldMail.getText().toString();
-
-                                            Intent intent = new Intent(getActivity(), HomeActivity.class);
-                                            startActivity(intent);
-                                            getActivity().finish();
-                                            Log.i(TAG, "operation is succesfull");
-                                        } else {
-                                            fieldMail.setError("verify");
-                                            fieldPassword.setError("verify");
-                                        }
-                                    }
-                                }
-                        );
+                if (isAccessToInternet(getActivity())) {
+                    if (validationForm()) {
+                        FirebaseDatabase.getInstance().getReference().addListenerForSingleValueEvent(listener);
                     }
                 } else {
-//                    if (validationForm()) {
-////                        UserApp currentUserApp;
-//                        if ((currentUserApp = localSqliteHandler.getUserApp(fieldMail.getText().toString(), fieldPassword.getText().toString())) != null) {
-//                            FlagAccess.NAME_USERAPP = currentUserApp.getName() + " " + currentUserApp.getSurname();
-//                            FlagAccess.MAIL_CURRENT_USERAPP = fieldMail.getText().toString();
-//
-//
-//                            Intent intent = new Intent(getActivity(), HomeActivity.class);
-//                            startActivity(intent);
-//                            getActivity().finish();
-//                        } else {
-//                            Toast.makeText(getActivity(), "user with such data don't exists!!!", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-                    Toast.makeText(getActivity(), "ops, check your connection with internet \n now you can only read!", Toast.LENGTH_SHORT).show();
+//NOP
                 }
             }
         });
@@ -147,7 +106,6 @@ public class FragmentSignIn extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
         if (status) {
             status = false;
             DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -161,25 +119,29 @@ public class FragmentSignIn extends Fragment {
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        FirebaseDatabase.getInstance().getReference().removeEventListener(listener);
+    }
+
     private boolean validationForm() {
         boolean result;
         if ((fieldMail.getText() != null && fieldMail.getText().toString().length() > 0) &&
                 (fieldPassword.getText() != null && fieldPassword.getText().toString().length() > 0)) {
             result = true;
         } else {
-            Toast.makeText(getActivity(), "ops!!! \n check your field and try again", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), this.getResources().getString(R.string.msg_no_correct_fields), Toast.LENGTH_SHORT).show();
             result = false;
         }
         return result;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.i(TAG, "call method stop in fragmentSignIn");
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
+    private boolean isAccessToInternet(Context context) {
+        NetworkInfo info = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        return (info == null ? false : info.isConnectedOrConnecting());
     }
 
 }
+
+

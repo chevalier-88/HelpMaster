@@ -1,28 +1,34 @@
 package chevalier.vladimir.gmail.com.helpmaster.utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
-import android.support.annotation.LayoutRes;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import chevalier.vladimir.gmail.com.helpmaster.R;
 import chevalier.vladimir.gmail.com.helpmaster.entities.Consumer;
 
-/**
- * Created by chevalier on 17.09.17.
- */
 
 public class ConsumerItemAdapter extends BaseAdapter {
     private Context context;
@@ -38,6 +44,7 @@ public class ConsumerItemAdapter extends BaseAdapter {
         TextView tvName;
         TextView tvBalance;
         TextView tvDiscount;
+
         public ConsumerItemHolder(View view) {
             imgPhoto = (ImageView) view.findViewById(R.id.id_item_consumer_img);
             tvName = (TextView) view.findViewById(R.id.id_item_consumer_name);
@@ -46,6 +53,7 @@ public class ConsumerItemAdapter extends BaseAdapter {
             view.setTag(this);
         }
     }
+
     @Override
     public int getCount() {
         return objects.size();
@@ -63,16 +71,13 @@ public class ConsumerItemAdapter extends BaseAdapter {
 
     @Override
     public int getViewTypeCount() {
-        // menu type count
         return 3;
     }
 
     @Override
     public int getItemViewType(int position) {
-        // current menu type
         return position % 3;
     }
-
 
 
     @Override
@@ -93,8 +98,13 @@ public class ConsumerItemAdapter extends BaseAdapter {
             holder.tvBalance.setTextColor(Color.RED);
         }
         holder.tvDiscount.setText("" + item.getDiscount());
-        holder.imgPhoto.setImageURI(Uri.parse(new File(item.getPathToPhoto()).exists()?item.getPathToPhoto():
-                "android.resource://chevalier.vladimir.gmail.com.helpmaster/" + R.drawable.no_name));
+        holder.imgPhoto.setImageURI(Uri.parse(item.getPathToPhoto()));
+        if ((position % 2) != 0) {
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.item_even_background));
+        } else {
+            convertView.setBackgroundColor(context.getResources().getColor(R.color.item_not_even_background));
+        }
+
         return convertView;
     }
 }

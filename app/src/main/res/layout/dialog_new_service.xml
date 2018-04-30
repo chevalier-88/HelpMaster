@@ -10,7 +10,7 @@
         android:layout_height="40sp"
         android:layout_margin="5dp"
         android:gravity="center"
-        android:hint="service name"
+        android:hint="@string/tv_service_item_name"
         android:inputType="textCapSentences" />
 
     <LinearLayout
@@ -26,7 +26,7 @@
             android:layout_margin="5dp"
             android:layout_weight="0.33"
             android:gravity="center"
-            android:hint="duration"
+            android:hint="@string/et_service_duration"
             android:inputType="number" />
 
         <EditText
@@ -36,7 +36,7 @@
             android:layout_margin="5dp"
             android:layout_weight="0.33"
             android:gravity="center"
-            android:hint="cost"
+            android:hint="@string/et_service_cost"
             android:inputType="number" />
 
         <EditText
@@ -46,7 +46,7 @@
             android:layout_margin="5dp"
             android:layout_weight="0.33"
             android:gravity="center"
-            android:hint="first cost"
+            android:hint="@string/et_service_f_cost"
             android:inputType="numberDecimal" />
     </LinearLayout>
 
@@ -56,7 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:gravity="center"
-        android:hint="description"
+        android:hint="@string/hint_description"
         android:inputType="textMultiLine"
         android:maxLines="3"
         android:minLines="3" />

@@ -20,12 +20,10 @@
         app:srcCompat="@drawable/logo" />
 
     <TextView
+        android:id="@+id/id_user_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="-35dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/str_name_autor"
-        android:layout_marginTop="-50dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-    />
-
 </LinearLayout>

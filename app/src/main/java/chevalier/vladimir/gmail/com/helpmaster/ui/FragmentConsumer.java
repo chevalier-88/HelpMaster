@@ -2,84 +2,120 @@ package chevalier.vladimir.gmail.com.helpmaster.ui;
 
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.TimeUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 
 import java.io.Serializable;
-import java.util.ArrayList;
+
+
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import chevalier.vladimir.gmail.com.helpmaster.R;
 import chevalier.vladimir.gmail.com.helpmaster.entities.Consumer;
 import chevalier.vladimir.gmail.com.helpmaster.utils.ConsumerItemAdapter;
-import chevalier.vladimir.gmail.com.helpmaster.utils.LocalSqliteHelper;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class FragmentConsumer extends Fragment {
 
     public static final int TARGET_CODE_NEW_CONSUMER = 12345;
     public static final int TARGET_CODE_EXISTS_CONSUMER = 54321;
-    private static final int MESSAGE_HANDLER_OK = 1;
-
-    private SwipeMenuListView listViewConsumers;
+    private static final int MESSAGE_HANDLER_OK = 200;
+    private SwipeMenuListView swipeListConsumers;
     private ConsumerItemAdapter itemAdapter;
     private List<Consumer> listConsumer;
-    private LocalSqliteHelper localSqliteHelper;
     private Handler handler;
+
+    private ValueEventListener listener;
+    private ProgressDialog progressBar;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+                Thread th = new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        for (DataSnapshot dd : dataSnapshot.child(getContext().getResources().getString(R.string.branch_consumers)).getChildren()) {
+                            Consumer consumer = dd.getValue(Consumer.class);
+                            if (!listConsumer.contains(consumer)) {
+                                listConsumer.add(consumer);
+                            }
+                        }
+                        handler.sendMessage(handler.obtainMessage(MESSAGE_HANDLER_OK));
+                    }
+
+                });
+                th.start();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                //NOP
+            }
+        };
+
+    }
 
     @SuppressLint("HandlerLeak")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        progressBar = new ProgressDialog(getContext());
+        progressBar.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        progressBar.getWindow().setGravity(Gravity.CENTER_HORIZONTAL);
+        progressBar.setCancelable(false);
+        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressBar.show();
+        progressBar.setContentView(R.layout.simple_progress_bar);
+
         View view = inflater.inflate(R.layout.fragment_consumers, container, false);
 
-        listViewConsumers = (SwipeMenuListView) view.findViewById(R.id.id_list_consumers);
-
-
-        localSqliteHelper = new LocalSqliteHelper(getContext());
+        listConsumer = new LinkedList<Consumer>();
+        itemAdapter = new ConsumerItemAdapter(getContext(), listConsumer);
+        swipeListConsumers = (SwipeMenuListView) view.findViewById(R.id.id_list_consumers);
+        swipeListConsumers.setAdapter(itemAdapter);
 
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.what == MESSAGE_HANDLER_OK) {
-                    itemAdapter = new ConsumerItemAdapter(getActivity(), listConsumer);
-                    listViewConsumers.setAdapter(itemAdapter);
+                    itemAdapter.notifyDataSetChanged();
+                    progressBar.dismiss();
                 }
             }
         };
         this.makeSwipeComponent();
-        Thread th = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                listConsumer = localSqliteHelper.getListConsumers() != null ? localSqliteHelper.getListConsumers() : new ArrayList<Consumer>();
-                handler.sendMessage(handler.obtainMessage(MESSAGE_HANDLER_OK));
-            }
-        });
-        th.start();
+
+        FirebaseDatabase.getInstance().getReference().addValueEventListener(listener);
 
 
         FloatingActionButton button = (FloatingActionButton) view.findViewById(R.id.id_fab_visitors);
@@ -88,21 +124,32 @@ public class FragmentConsumer extends Fragment {
             public void onClick(View v) {
                 DialogNewConsumer dialog = new DialogNewConsumer();
                 dialog.setTargetFragment(FragmentConsumer.this, TARGET_CODE_NEW_CONSUMER);
-                dialog.show(getFragmentManager(), "add visitor:");
+                dialog.show(getFragmentManager(), getContext().getResources().getString(R.string.tg_btn_add_consumer));
             }
         });
         return view;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        FirebaseDatabase.getInstance().getReference().removeEventListener(listener);
+    }
+
     public void addConsumer(Consumer consumer) {
+        FirebaseDatabase.getInstance().getReference().child(getContext().getResources().getString(R.string.branch_consumers)).child(consumer.getName() + " " + consumer.getSurname()).setValue(consumer);
         listConsumer.add(consumer);
-        itemAdapter.notifyDataSetInvalidated();
+        itemAdapter.notifyDataSetChanged();
     }
 
     public void updateConsumerDescription(int index, Consumer consumer) {
+        FirebaseDatabase.getInstance().getReference().child(getContext().getResources().getString(R.string.branch_consumers)).child(
+                listConsumer.get(index).getName() + " " + listConsumer.get(index).getSurname()).removeValue();
+        FirebaseDatabase.getInstance().getReference().child(getContext().getResources().getString(R.string.branch_consumers)).child(
+                consumer.getName() + " " + consumer.getSurname()).setValue(consumer);
+
         listConsumer.set(index, consumer);
         itemAdapter.notifyDataSetChanged();
-//        listViewConsumers.setAdapter(itemAdapter);
     }
 
     private void makeSwipeComponent() {
@@ -135,35 +182,39 @@ public class FragmentConsumer extends Fragment {
                 menu.addMenuItem(callItem);
             }
         };
-        listViewConsumers.setMenuCreator(creator);
+        swipeListConsumers.setMenuCreator(creator);
 
-        listViewConsumers.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+        swipeListConsumers.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
 
-        listViewConsumers.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener()
+        swipeListConsumers.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener()
 
         {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-                Consumer selectedConsumer = (Consumer) listViewConsumers.getAdapter().getItem(position);
+
                 switch (index) {
                     case 0:
-                        localSqliteHelper.deleteConsumer(selectedConsumer.getName(), selectedConsumer.getSurname());
-                        listConsumer.remove(selectedConsumer);
+                        Consumer consumerForRemove = (Consumer) swipeListConsumers.getAdapter().getItem(position);
+                        FirebaseDatabase.getInstance().getReference().child(getContext().getResources().getString(R.string.branch_consumers)).child(consumerForRemove.getName() + " " + consumerForRemove.getSurname()).removeValue();
+                        listConsumer.remove(consumerForRemove);
                         itemAdapter.notifyDataSetInvalidated();
                         break;
                     case 1:
-                        DialogNewConsumer dialog = new DialogNewConsumer();
-                        dialog.setTargetFragment(FragmentConsumer.this, TARGET_CODE_EXISTS_CONSUMER);
-                        dialog.show(getFragmentManager(), "add visitor:");
+                        Consumer consumerForEdit = (Consumer) swipeListConsumers.getAdapter().getItem(position);
 
                         Bundle b = new Bundle();
                         b.putInt("index", position);
-                        b.putSerializable("consumer", (Serializable) selectedConsumer);
+                        b.putSerializable("consumer", (Serializable) consumerForEdit);
+
+                        DialogNewConsumer dialog = new DialogNewConsumer();
+                        dialog.setTargetFragment(FragmentConsumer.this, TARGET_CODE_EXISTS_CONSUMER);
                         dialog.setArguments(b);
+                        dialog.show(getFragmentManager(), getContext().getResources().getString(R.string.tg_btn_add_consumer));
                         break;
                     case 2:
+                        Consumer consumerForCall = (Consumer) swipeListConsumers.getAdapter().getItem(position);
                         Intent intent = new Intent(Intent.ACTION_DIAL);
-                        intent.setData(Uri.parse("tel:" + selectedConsumer.getPhoneNumber()));
+                        intent.setData(Uri.parse(getContext().getResources().getString(R.string.tel) + consumerForCall.getPhoneNumber()));
                         Intent chooser = Intent.createChooser(intent, getContext().getResources().getString(R.string.select_app_for_call));
                         startActivity(chooser);
                         break;

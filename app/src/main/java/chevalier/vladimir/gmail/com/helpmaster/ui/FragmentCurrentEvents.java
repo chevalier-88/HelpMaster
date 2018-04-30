@@ -1,13 +1,18 @@
 package chevalier.vladimir.gmail.com.helpmaster.ui;
 
 
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,70 +22,131 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import chevalier.vladimir.gmail.com.helpmaster.R;
 import chevalier.vladimir.gmail.com.helpmaster.entities.EventItem;
 import chevalier.vladimir.gmail.com.helpmaster.utils.EventItemAdapter;
-import chevalier.vladimir.gmail.com.helpmaster.utils.LocalSqliteHelper;
 
 public class FragmentCurrentEvents extends Fragment {
 
-    private static final int MESSAGE_HENDLER = 1;
-    public static final int TARGET_CODE_NEW_EVENT = 12345;
-    public static final int TARGET_CODE_EXISTS_EVENT = 54321;
+    private static final int MESSAGE_HENDLER_OK = 200;
+    public static final int TARGET_CODE_NEW_EVENT = 201;
+    public static final int TARGET_CODE_EXISTS_EVENT = 202;
 
     private List<EventItem> eventList;
-//    private MyEventItemAdapter itemAdapter;
+
     private EventItemAdapter itemAdapter;
     private SwipeMenuListView listView;
     private Handler handler;
-    private LocalSqliteHelper sqliteHelper;
+
+
     private View view;
 
+    private ValueEventListener listener;
+
+    private ProgressDialog progressBar;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        eventList = new LinkedList<>();
+
+        if (FirebaseApp.getApps(getContext()).isEmpty())
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(final DataSnapshot dataSnapshot) {
+
+                Thread th = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<EventItem> items = new LinkedList<>();
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if (dataSnapshot.child(getContext().getResources().getString(R.string.branch_users)).child(HomeActivity.MAIL_CURRENT_USER.replace(".", "~")).child(getContext().getResources().getString(R.string.subbranch_events)).getChildrenCount() > 0) {
+                            for (DataSnapshot d : dataSnapshot.child(getContext().getResources().getString(R.string.branch_users)).child(HomeActivity.MAIL_CURRENT_USER.replace(".", "~")).child(getContext().getResources().getString(R.string.subbranch_events)).getChildren()) {
+                                EventItem event = d.getValue(EventItem.class);
+                                if (!items.contains(event)) {
+                                    items.add(event);
+                                }
+
+                            }
+                            eventList.clear();
+                            eventList.addAll(filterListEvent(items, HomeActivity.SORTED_FLAG));
+                            handler.sendMessage(handler.obtainMessage(MESSAGE_HENDLER_OK));
+                        } else {
+                            //TODO
+                            handler.sendMessage(handler.obtainMessage(MESSAGE_HENDLER_OK));
+                        }
+                    }
+
+                });
+                th.start();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+    }
+
+    @SuppressLint("HandlerLeak")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.fragment_current_events, container, false);
-        sqliteHelper = new LocalSqliteHelper(this.getContext());
+        progressBar = new ProgressDialog(getContext());
+        progressBar.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        progressBar.getWindow().setGravity(Gravity.CENTER_HORIZONTAL);
+        progressBar.setCancelable(false);
+        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressBar.show();
+        progressBar.setContentView(R.layout.simple_progress_bar);
 
+        view = inflater.inflate(R.layout.fragment_current_events, container, false);
+
+        itemAdapter = new EventItemAdapter(getContext(), eventList);
 
         listView = (SwipeMenuListView) view.findViewById(R.id.id_events);
+        listView.setAdapter(itemAdapter);
 
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                if (msg.what == MESSAGE_HENDLER) {
-                    itemAdapter = new EventItemAdapter(getContext(), eventList);
-//                    itemAdapter = new MyEventItemAdapter();
-                    listView.setAdapter(itemAdapter);
+                if (msg.what == MESSAGE_HENDLER_OK) {
+                    itemAdapter.notifyDataSetChanged();
+                    progressBar.dismiss();
                 }
             }
-        }
+        };
 
-        ;
+        this.makeSwipeComponent();
 
-        Thread th = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                eventList = sqliteHelper.getListEvents() != null ? sqliteHelper.getListEvents() : new LinkedList<EventItem>();
-                handler.sendMessage(handler.obtainMessage(MESSAGE_HENDLER));
-            }
-        });
-        th.start();
-        this.
-
-                makeSwipeComponent();
+        FirebaseDatabase.getInstance().getReference().addListenerForSingleValueEvent(listener);
 
         FloatingActionButton button = (FloatingActionButton) view.findViewById(R.id.fab);
         button.setOnClickListener(new View.OnClickListener()
@@ -90,23 +156,67 @@ public class FragmentCurrentEvents extends Fragment {
             public void onClick(View v) {
                 DialogNewEvent dialogFragment = new DialogNewEvent();
                 dialogFragment.setTargetFragment(FragmentCurrentEvents.this, TARGET_CODE_NEW_EVENT);
-                dialogFragment.show(getFragmentManager(), "add event:");
-
+                dialogFragment.show(getFragmentManager(), getContext().getResources().getString(R.string.tg_btn_add_event));
             }
         });
         return view;
     }
 
-
-    public void addEvent(EventItem event) {
-        eventList.add(event);
-        itemAdapter.notifyDataSetInvalidated();
+    @Override
+    public void onStop() {
+        super.onStop();
+        FirebaseDatabase.getInstance().getReference().removeEventListener(listener);
     }
 
-    public void updateEvent(int index, EventItem event) {
-        if(eventList!=null){eventList.set(index, event);
-        itemAdapter.notifyDataSetChanged();}
-//        listView.setAdapter(itemAdapter);
+    public void addEvent(EventItem event) {
+        if (HomeActivity.NAME_CURRENT_USER.equals(event.getStaff())) {
+            FirebaseDatabase.getInstance().getReference().child(getContext().getResources().getString(R.string.branch_users)).child(HomeActivity.MAIL_CURRENT_USER.replace(".", "~")).child(getContext().getResources().getString(R.string.subbranch_events)).child(event.getDate() + " " + event.getConsumer()).setValue(event);
+            switch (HomeActivity.SORTED_FLAG) {
+                case 1:
+
+                    try {
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+                        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+                        Date firstDayOfWeek = dateFormat.parse(dateFormat.format(calendar.getTime()));
+
+                        calendar.set(Calendar.DAY_OF_WEEK, calendar.getActualMinimum(Calendar.DAY_OF_WEEK));
+                        Date lastDayOfWeek = dateFormat.parse(dateFormat.format(calendar.getTime()));
+
+                        Date eventDay = dateFormat.parse(event.getDate());
+                        if (((firstDayOfWeek.compareTo(eventDay)) < 0) && (eventDay.compareTo(lastDayOfWeek) < 0)) {
+//                            eventList.add(event);
+                            ((LinkedList<EventItem>) eventList).addFirst(event);
+                            itemAdapter.notifyDataSetInvalidated();
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 2:
+                    if ((Calendar.getInstance().get(Calendar.MONTH) + 1) == Integer.parseInt(event.getDate().split(" ")[0].trim().split("-")[1].trim())) {
+                        eventList.add(event);
+                        itemAdapter.notifyDataSetInvalidated();
+                    }
+                    break;
+                case 3:
+                    eventList.add(event);
+                    itemAdapter.notifyDataSetInvalidated();
+                    break;
+            }
+        } else {
+            //TODO
+        }
+    }
+
+    public void updateEvent(int index, EventItem event, String key) {
+        FirebaseDatabase.getInstance().getReference().child(getContext().getResources().getString(R.string.branch_users)).child(HomeActivity.MAIL_CURRENT_USER.replace(".", "~")).child(getContext().getResources().getString(R.string.subbranch_events)).child(key).removeValue();
+        FirebaseDatabase.getInstance().getReference().child(getContext().getResources().getString(R.string.branch_users)).child(HomeActivity.MAIL_CURRENT_USER.replace(".", "~")).child(getContext().getResources().getString(R.string.subbranch_events)).child(event.getDate() + " " + event.getConsumer()).setValue(event);
+        eventList.set(index, event);
+        itemAdapter.notifyDataSetChanged();
     }
 
     private void makeSwipeComponent() {
@@ -150,9 +260,10 @@ public class FragmentCurrentEvents extends Fragment {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 EventItem event = (EventItem) listView.getAdapter().getItem(position);
+
                 switch (index) {
                     case 0:
-                        sqliteHelper.deleteEvent(event.getDate().toString(), event.getConsumer());
+                        FirebaseDatabase.getInstance().getReference().child(getContext().getResources().getString(R.string.branch_users)).child(HomeActivity.MAIL_CURRENT_USER.replace(".", "~")).child(getContext().getResources().getString(R.string.subbranch_events)).child(event.getDate() + " " + event.getConsumer()).removeValue();
                         eventList.remove(event);
                         itemAdapter.notifyDataSetInvalidated();
                         break;
@@ -160,7 +271,7 @@ public class FragmentCurrentEvents extends Fragment {
                         DialogNewEvent dialogFragment = new DialogNewEvent();
                         dialogFragment.setTargetFragment(FragmentCurrentEvents.this, TARGET_CODE_EXISTS_EVENT);
                         dialogFragment.setFlag(200);
-                        dialogFragment.show(getFragmentManager(), "add event:");
+                        dialogFragment.show(getFragmentManager(), getContext().getResources().getString(R.string.tg_btn_add_event));
 
                         Bundle b = new Bundle();
                         b.putInt("index", position);
@@ -169,11 +280,11 @@ public class FragmentCurrentEvents extends Fragment {
                         break;
                     case 2:
                         if (event.getPhoneConsumer().toString().equals("-")) {
-                            Toast.makeText(getContext(), "Sorry, but this consumer didn't provide a phone number :-(", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), getContext().getResources().getString(R.string.unsupport_call_consumer), Toast.LENGTH_LONG).show();
                         } else {
                             Intent intent = new Intent(Intent.ACTION_DIAL);
                             Intent chooser = Intent.createChooser(intent, getString(R.string.select_app_for_call));
-                            intent.setData(Uri.parse("tel:" + event.getPhoneConsumer()));
+                            intent.setData(Uri.parse(getContext().getResources().getString(R.string.tel) + event.getPhoneConsumer()));
                             startActivity(chooser);
                         }
                         break;
@@ -181,70 +292,54 @@ public class FragmentCurrentEvents extends Fragment {
                 return false;
             }
         });
-//    }
     }
 
-//    class MyEventItemAdapter extends BaseAdapter {
-//
-//        @Override
-//        public int getCount() {
-//            return eventList.size();
-//        }
-//
-//        @Override
-//        public EventItem getItem(int position) {
-//            return eventList.get(position);
-//        }
-//
-//        @Override
-//        public long getItemId(int position) {
-//            return position;
-//        }
-//
-//        @Override
-//        public int getViewTypeCount() {
-//            // menu type count
-//            return 3;
-//        }
-//
-//        @Override
-//        public int getItemViewType(int position) {
-//            // current menu type
-//            return position % 3;
-//        }
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//            if (convertView == null) {
-//                convertView = View.inflate(getContext(),
-//                        R.layout.custom_item_event, null);
-//                new ViewHolder(convertView);
-//            }
-//            ViewHolder holder = (ViewHolder) convertView.getTag();
-//            EventItem item = getItem(position);
-//            holder.tvDate.setText(item.getDate());
-//            holder.tvService.setText(item.getService());
-//            holder.tvCostumer.setText(item.getConsumer());
-//
-//            return convertView;
-//        }
-//
-//        class ViewHolder {
-//            TextView tvDate;
-//            TextView tvService;
-//            TextView tvCostumer;
-//
-//            public ViewHolder(View view) {
-//                tvDate = (TextView) view.findViewById(R.id.id_cie_date);
-//                tvService = (TextView) view.findViewById(R.id.id_cie_service);
-//                tvCostumer = (TextView) view.findViewById(R.id.id_cie_consumer);
-//                view.setTag(this);
-//            }
-//        }
-//    }
-//
-//    private int dp2px(int dp) {
-//        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-//                getResources().getDisplayMetrics());
-//    }
+    private List<EventItem> filterListEvent(List<EventItem> events, int filter) {
+        List<EventItem> result = new LinkedList<>();
+
+        switch (filter) {
+
+            case 1:
+
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setFirstDayOfWeek(Calendar.MONDAY);
+
+                    calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+                    Date firstDayOfWeek = dateFormat.parse(dateFormat.format(calendar.getTime()));
+
+                    calendar.set(Calendar.DAY_OF_WEEK, calendar.getActualMinimum(Calendar.DAY_OF_WEEK));
+                    Date lastDayOfWeek = dateFormat.parse(dateFormat.format(calendar.getTime()));
+                    for (EventItem item : events) {
+                        Date eventDay = dateFormat.parse(item.getDate());
+                        if (((firstDayOfWeek.compareTo(eventDay)) <= 0) && (eventDay.compareTo(lastDayOfWeek) <= 0)) {
+                            result.add(item);
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+
+                }
+                break;
+
+            case 2:
+                Calendar calendar = Calendar.getInstance();
+                int currentMonth = calendar.get(Calendar.MONTH) + 1;
+                for (EventItem item : events) {
+                    if (currentMonth == Integer.parseInt(item.getDate().split(" ")[0].trim().split("-")[1].trim())) {
+                        result.add(item);
+                    }
+                }
+
+                break;
+            case 3:
+                result.clear();
+                result.addAll(events);
+                break;
+        }
+        Collections.sort(result);
+        Collections.reverse(result);
+        return result;
+    }
 }
