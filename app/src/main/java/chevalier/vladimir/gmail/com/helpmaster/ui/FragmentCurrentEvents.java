@@ -175,7 +175,7 @@ public class FragmentCurrentEvents extends Fragment {
                 case 1:
 
                     try {
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH);
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
                         Calendar calendar = Calendar.getInstance();
                         calendar.setFirstDayOfWeek(Calendar.MONDAY);
@@ -187,8 +187,7 @@ public class FragmentCurrentEvents extends Fragment {
                         Date lastDayOfWeek = dateFormat.parse(dateFormat.format(calendar.getTime()));
 
                         Date eventDay = dateFormat.parse(event.getDate());
-                        if (((firstDayOfWeek.compareTo(eventDay)) < 0) && (eventDay.compareTo(lastDayOfWeek) < 0)) {
-//                            eventList.add(event);
+                        if (((firstDayOfWeek.compareTo(eventDay)) <= 0) && (eventDay.compareTo(lastDayOfWeek) <= 0)) {
                             ((LinkedList<EventItem>) eventList).addFirst(event);
                             itemAdapter.notifyDataSetInvalidated();
                         }
@@ -198,12 +197,13 @@ public class FragmentCurrentEvents extends Fragment {
                     break;
                 case 2:
                     if ((Calendar.getInstance().get(Calendar.MONTH) + 1) == Integer.parseInt(event.getDate().split(" ")[0].trim().split("-")[1].trim())) {
-                        eventList.add(event);
+                        ((LinkedList<EventItem>) eventList).addFirst(event);
                         itemAdapter.notifyDataSetInvalidated();
                     }
                     break;
                 case 3:
-                    eventList.add(event);
+//                    eventList.add(event);
+                    ((LinkedList<EventItem>) eventList).addFirst(event);
                     itemAdapter.notifyDataSetInvalidated();
                     break;
             }
