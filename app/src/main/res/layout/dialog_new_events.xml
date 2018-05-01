@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,7 +65,7 @@
             android:layout_gravity="center"
             android:layout_row="1"
             android:gravity="center"
-            android:text="time:" />
+            android:text="@string/tv_d_new_event_time" />
 
         <Spinner
             android:id="@+id/id_dialog_spinner_hour"
@@ -118,8 +119,13 @@
             android:layout_marginRight="15dp"
             android:layout_marginTop="10dp"
             android:layout_weight="0.6"
+            android:digits="@string/character_case"
+            android:hint="@string/e_t_d_new_event_name_hint"
+            android:inputType="textCapWords"
+            android:lines="1"
+            android:maxWidth="150sp" />
 
-            android:hint="client name" />
+
         <!--android:layout_column="1"-->
         <!--android:layout_columnSpan="2"-->
         <!--android:layout_row="2"-->
@@ -130,7 +136,7 @@
             android:layout_marginTop="10dp"
             android:layout_weight="0.2"
             android:gravity="center"
-            android:text="disc:" />
+            android:text="@string/tv_discount" />
 
         <EditText
             android:id="@+id/id_dialog_et_discount"
@@ -157,10 +163,24 @@
         android:inputType="text"
         android:lines="1" />
 
-    <EditText
+    <!--<EditText-->
+    <!--android:id="@+id/id_dialog_staff_name"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="40sp"-->
+    <!--android:layout_marginBottom="10dp"-->
+    <!--android:layout_marginLeft="15dp"-->
+    <!--android:layout_marginRight="15dp"-->
+    <!--android:layout_marginTop="10dp"-->
+    <!--android:hint="@string/staff_name"-->
+    <!--android:inputType="text"-->
+    <!--android:lines="1" />-->
+    <!--android:layout_row="3"-->
+    <!--row 4, service: -->
+    <AutoCompleteTextView
         android:id="@+id/id_dialog_staff_name"
         android:layout_width="match_parent"
         android:layout_height="40sp"
+
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
@@ -168,8 +188,7 @@
         android:hint="@string/staff_name"
         android:inputType="text"
         android:lines="1" />
-    <!--android:layout_row="3"-->
-    <!--row 4, service: -->
+
     <Spinner
         android:id="@+id/id_dialog_spinner_service"
         android:layout_width="match_parent"
@@ -189,6 +208,6 @@
         android:layout_marginBottom="20dp"
         android:layout_marginTop="40dp"
         android:gravity="center"
-        android:text="add" />
+        android:text="@string/btn_add" />
 
 </LinearLayout>

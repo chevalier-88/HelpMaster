@@ -3,11 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary">
-    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="@color/colorPrimary"-->
-    <!--android:orientation="vertical">-->
 
     <ImageView
         android:id="@+id/id_s_i_img_logo"
@@ -45,10 +40,9 @@
             android:background="@drawable/selector_edit_text_style"
             android:gravity="center"
             android:hint="@string/e_t_password"
-            android:inputType="text"
+            android:inputType="textPassword"
             android:lines="1"
             android:textSize="24sp" />
-        <!--android:inputType="textPassword"-->
 
         <Button
             android:id="@+id/id_s_i_btn_signin"
@@ -58,5 +52,4 @@
             android:background="@drawable/selector_btn_style"
             android:text="@string/btn_sign_in" />
     </LinearLayout>
-    <!--</LinearLayout>-->
 </FrameLayout>

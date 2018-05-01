@@ -78,7 +78,7 @@
             android:layout_margin="5dp"
             android:layout_weight="0.5"
             android:gravity="center"
-            android:hint="@string/dialog_consumer_hint_balance"
+            android:hint="@string/consumer_balance"
             android:inputType="numberDecimal" />
 
         <EditText

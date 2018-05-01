@@ -4,7 +4,8 @@
     <!--<color name="colorPrimaryDark">#303F9F</color>-->
     <color name="colorPrimary">#CCE5FF</color>
     <color name="colorPrimaryDark">#699FFC</color>
-    <color name="colorAccent">#FF4081</color>
+    <!--<color name="colorAccent">#FF4081</color>-->
+    <color name="colorAccent"> #0033CC</color>
     <color name="black">#000</color>
     <!--<color name="blue">#699FFC</color>-->
     <!--<color name="light_blue">#CCE5FF</color>-->
@@ -14,4 +15,8 @@
     <color name="light_gray">#E6E6E6</color>
     <color name="dark_gray">#B3B3B3</color>
     <color name="white">#FFFFFF</color>
+    <!--<color name="item_even_background">#E7EFF4</color>-->
+    <color name="item_even_background">#CAE0F4</color>
+    <!--<color name="item_not_even_background">#F0E7ED</color>-->
+    <color name="item_not_even_background">#E0E4E7</color>
 </resources>

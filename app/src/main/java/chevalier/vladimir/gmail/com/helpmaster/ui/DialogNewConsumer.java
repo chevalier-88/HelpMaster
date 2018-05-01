@@ -18,23 +18,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+
 import java.io.File;
 
 import chevalier.vladimir.gmail.com.helpmaster.R;
 import chevalier.vladimir.gmail.com.helpmaster.entities.Consumer;
-import chevalier.vladimir.gmail.com.helpmaster.utils.LocalSqliteHelper;
 
 import static android.app.Activity.RESULT_OK;
 
-/**
- * Created by chevalier on 19.08.17.
- */
 
 public class DialogNewConsumer extends DialogFragment {
 
 
     private FragmentConsumer fragmentConsumer;
-    private LocalSqliteHelper sqliteLocalHelper;
 
     private ImageView imgPhoto;
     private EditText etName;
@@ -45,10 +41,9 @@ public class DialogNewConsumer extends DialogFragment {
     private EditText etDescription;
     private Button btnAdd;
 
-    private Handler handler;
+    private Handler handlerDialog;
     private Bundle bundle;
-    private String existNameConsumer;
-    private String existSurnameConsumer;
+
 
     private static final int FLAG_HANDLER_MESSAGE_OK = 1;
     private static final int FLAG_HANDLER_MESSAGE_OPS = 0;
@@ -58,6 +53,12 @@ public class DialogNewConsumer extends DialogFragment {
     private String IMAGE_FILE_PATH = "android.resource://chevalier.vladimir.gmail.com.helpmaster/" + R.drawable.no_name;
     private Consumer consumer;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_Alert);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,7 +66,6 @@ public class DialogNewConsumer extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_new_consumer, container, false);
         getDialog().setCanceledOnTouchOutside(false);
 
-        sqliteLocalHelper = new LocalSqliteHelper(this.getContext());
         switch (getTargetRequestCode()) {
             case FragmentConsumer.TARGET_CODE_NEW_CONSUMER:
                 makeDialogNewConsumer(view);
@@ -84,14 +84,14 @@ public class DialogNewConsumer extends DialogFragment {
         fragmentConsumer = (FragmentConsumer) getTargetFragment();
 
 
-        handler = new Handler() {
+        handlerDialog = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case FLAG_HANDLER_MESSAGE_OK:
                         fragmentConsumer.addConsumer(consumer);
-                        handler = null;
-                        DialogNewConsumer.this.dismiss();
+                        handlerDialog = null;
+                        dismiss();
                         break;
                     case FLAG_HANDLER_MESSAGE_OPS:
                         Toast.makeText(getContext(), R.string.msg_no_correct_fields, Toast.LENGTH_SHORT).show();
@@ -136,10 +136,9 @@ public class DialogNewConsumer extends DialogFragment {
                         @Override
                         public void run() {
                             if (consumer != null) {
-                                sqliteLocalHelper.writeNewConsumer(consumer);
-                                handler.sendMessage(handler.obtainMessage(FLAG_HANDLER_MESSAGE_OK));
+                                handlerDialog.sendMessage(handlerDialog.obtainMessage(FLAG_HANDLER_MESSAGE_OK));
                             } else {
-                                handler.sendMessage(handler.obtainMessage(FLAG_HANDLER_MESSAGE_OPS));
+                                handlerDialog.sendMessage(handlerDialog.obtainMessage(FLAG_HANDLER_MESSAGE_OPS));
                             }
                         }
                     });
@@ -149,11 +148,13 @@ public class DialogNewConsumer extends DialogFragment {
         });
     }
 
+    @SuppressLint("HandlerLeak")
     private void makeDialogExistsConsumer(View v) {
         bundle = getArguments();
         Consumer existConsumer = (Consumer) bundle.getSerializable("consumer");
-        existNameConsumer = existConsumer.getName();
-        existSurnameConsumer = existConsumer.getSurname();
+//        existNameConsumer = existConsumer.getName();
+//        existSurnameConsumer = existConsumer.getSurname();
+//        existPhoneNumberConsumer = existConsumer.getPhoneNumber();
 
         imgPhoto = (ImageView) v.findViewById(R.id.id_dialog_consumer_img);
         if (new File(existConsumer.getPathToPhoto()).exists()) {
@@ -183,25 +184,25 @@ public class DialogNewConsumer extends DialogFragment {
         etBalance = (EditText) v.findViewById(R.id.id_dialog_consumer_balance);
         etBalance.setText("" + (int) existConsumer.getBalance());
         etDiscount = (EditText) v.findViewById(R.id.id_dialog_consumer_discount);
-        etDiscount.setText(""+existConsumer.getDiscount());
+        etDiscount.setText("" + existConsumer.getDiscount());
         etDescription = (EditText) v.findViewById(R.id.id_dialog_consumer_description);
         etDescription.setText(existConsumer.getDescription());
 
 
         fragmentConsumer = (FragmentConsumer) getTargetFragment();
 
-        handler = new Handler() {
+        handlerDialog = new Handler() {
 
             @Override
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case FLAG_HANDLER_MESSAGE_OK:
                         fragmentConsumer.updateConsumerDescription(bundle.getInt("index"), consumer);
-                        handler = null;
+                        handlerDialog = null;
                         dismiss();
                         break;
                     case FLAG_HANDLER_MESSAGE_OPS:
-                        Toast.makeText(getActivity(), "check fields and try again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getContext().getResources().getString(R.string.msg_no_correct_fields), Toast.LENGTH_SHORT).show();
                         break;
                 }
 
@@ -221,10 +222,9 @@ public class DialogNewConsumer extends DialogFragment {
                         @Override
                         public void run() {
                             if (consumer != null) {
-                                sqliteLocalHelper.updateConsumer(existNameConsumer, existSurnameConsumer, consumer);
-                                handler.sendMessage(handler.obtainMessage(FLAG_HANDLER_MESSAGE_OK));
+                                handlerDialog.sendMessage(handlerDialog.obtainMessage(FLAG_HANDLER_MESSAGE_OK));
                             } else {
-                                handler.sendMessage(handler.obtainMessage(FLAG_HANDLER_MESSAGE_OPS));
+                                handlerDialog.sendMessage(handlerDialog.obtainMessage(FLAG_HANDLER_MESSAGE_OPS));
                             }
                         }
                     });

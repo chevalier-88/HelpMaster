@@ -5,5 +5,5 @@
     android:layout_height="match_parent"
     android:layout_marginRight="100dp"
     android:gravity="end"
-    android:text="footer"
+    android:text="и того"
     android:textSize="30sp" />

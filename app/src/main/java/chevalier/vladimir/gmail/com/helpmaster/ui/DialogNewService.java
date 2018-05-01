@@ -1,6 +1,6 @@
 package chevalier.vladimir.gmail.com.helpmaster.ui;
 
-import android.os.Build;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import chevalier.vladimir.gmail.com.helpmaster.R;
 import chevalier.vladimir.gmail.com.helpmaster.entities.Service;
-import chevalier.vladimir.gmail.com.helpmaster.utils.LocalSqliteHelper;
 
 /**
  * Created by chevalier on 19.08.17.
@@ -29,7 +28,6 @@ public class DialogNewService extends DialogFragment {
     private EditText serviceFirstCost;
     private EditText serviceDescription;
     private Button btnAdd;
-//    private LocalSqliteHelper sqliteHelper;
     private FragmentServices fragmentServices;
     private Handler handler;
     private Service service;
@@ -40,6 +38,11 @@ public class DialogNewService extends DialogFragment {
 
     private String oldNameService;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_Alert);
+    }
 
     @Nullable
     @Override
@@ -47,8 +50,6 @@ public class DialogNewService extends DialogFragment {
         getDialog().getWindow().setBackgroundDrawableResource(R.drawable.rounded_dialog);
         View view = inflater.inflate(R.layout.dialog_new_service, container, false);
         getDialog().setCanceledOnTouchOutside(false);
-
-//        sqliteHelper = new LocalSqliteHelper(this.getActivity());
 
         switch (getTargetRequestCode()) {
             case FragmentServices.TARGET_CODE_NEW_SERVICE:
@@ -63,6 +64,7 @@ public class DialogNewService extends DialogFragment {
         return view;
     }
 
+    @SuppressLint("HandlerLeak")
     private void makeDialogNewService(View v) {
         serviceName = (EditText) v.findViewById(R.id.id_dialog_service_name);
         serviceDuration = (EditText) v.findViewById(R.id.id_dialog_service_duration);
@@ -81,7 +83,7 @@ public class DialogNewService extends DialogFragment {
                         dismiss();
                         break;
                     case OPS:
-                        Toast.makeText(getActivity(), "check fields and try again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getContext().getResources().getString(R.string.msg_no_correct_fields), Toast.LENGTH_SHORT).show();
                         break;
                 }
 
@@ -101,8 +103,8 @@ public class DialogNewService extends DialogFragment {
                         @Override
                         public void run() {
                             if (service != null) {
-//                                sqliteHelper.writeNewService(service);
                                 handler.sendMessage(handler.obtainMessage(ADD_SERVICE));
+//                                handler.sendEmptyMessage(ADD_SERVICE);
                             } else {
                                 handler.sendMessage(handler.obtainMessage(OPS));
                             }
@@ -117,6 +119,7 @@ public class DialogNewService extends DialogFragment {
 
     }
 
+    @SuppressLint("HandlerLeak")
     private void makeDialogExistsService(View v) {
 
         b = getArguments();
@@ -146,7 +149,7 @@ public class DialogNewService extends DialogFragment {
                         dismiss();
                         break;
                     case OPS:
-                        Toast.makeText(getActivity(), "check fields and try again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getContext().getResources().getString(R.string.msg_no_correct_fields), Toast.LENGTH_SHORT).show();
                         break;
                 }
 

@@ -6,34 +6,35 @@ import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import chevalier.vladimir.gmail.com.helpmaster.R;
-import chevalier.vladimir.gmail.com.helpmaster.entities.FlagAccess;
 import chevalier.vladimir.gmail.com.helpmaster.entities.UserApp;
-import chevalier.vladimir.gmail.com.helpmaster.utils.LocalSqliteHelper;
 
 
 public class FragmentSignUp extends Fragment {
 
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-//    private FirebaseDatabase database;
-//    private DatabaseReference ref;
+    private ValueEventListener listener;
+
 
     private EditText etName;
     private EditText etSurname;
@@ -43,26 +44,47 @@ public class FragmentSignUp extends Fragment {
     private EditText etConfPassword;
 
 
-    private LocalSqliteHelper localHelper;
+    private SharedPreferences sp;
+    private static final String PERSONAL_DATA = "PERSONAL_DATA";
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    //TODO
-//                    Log.i(TAG, "user is exists and signIn");
-                } else {
-//                    Log.i(TAG, "user is null, and ist signOut");
-                    //TODO
-                }
+        if (FirebaseApp.getApps(getActivity()).isEmpty())
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
+        listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                try {
+                    sp = getActivity().getSharedPreferences(PERSONAL_DATA, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    String userName = etName.getText().toString().trim();
+                    String userSurname = etSurname.getText().toString().trim();
+                    String userPhone = etPhone.getText().toString().trim();
+                    String userEmail = etEmail.getText().toString().trim();
+
+                    editor.putString(getActivity().getResources().getString(R.string.key_name_current_user), userName + "" + userSurname);
+                    editor.putString(getActivity().getResources().getString(R.string.key_phone_current_user), userPhone);
+                    editor.putString(getActivity().getResources().getString(R.string.key_mail_current_user), userEmail);
+                    editor.putInt(getActivity().getResources().getString(R.string.sort_events), getActivity().getResources().getInteger(R.integer.default_sorted_key));
+                    editor.putBoolean(getActivity().getResources().getString(R.string.notification_mode), getActivity().getResources().getBoolean(R.bool.default_notification_mode));
+                    editor.commit();
+
+                } catch (
+                        Exception ioe) {
+                    FirebaseDatabase.getInstance().getReference().child(getActivity().getResources().getString(R.string.branch_users)).removeValue();
+                } finally {
+                    Toast.makeText(getActivity().getApplicationContext(), getActivity().getResources().getString(R.string.rest), Toast.LENGTH_SHORT).show();
+                    restartApp();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                FirebaseDatabase.getInstance().getReference().child(getActivity().getResources().getString(R.string.branch_users)).removeValue();
             }
         };
     }
@@ -73,8 +95,6 @@ public class FragmentSignUp extends Fragment {
         View view = inflater.inflate(R.layout.fragment_sign_up, container, false);
 
 
-        localHelper = new LocalSqliteHelper(getActivity());
-
         etName = (EditText) view.findViewById(R.id.id_s_up_name);
         etSurname = (EditText) view.findViewById(R.id.id_s_up_surname);
         etPhone = (EditText) view.findViewById(R.id.id_s_up_phone);
@@ -82,40 +102,30 @@ public class FragmentSignUp extends Fragment {
         etPassword = (EditText) view.findViewById(R.id.id_s_up_password);
         etConfPassword = (EditText) view.findViewById(R.id.id_s_up_confirm_password);
 
-        Button btnSignUp = (Button) view.findViewById(R.id.id_s_up_btn_reg);
-
-        btnSignUp.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.id_s_up_btn_reg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (FlagAccess.checkNetWorkAccess(getActivity())) {
+                if (isAccessToInternet(getActivity())) {
                     if (formValidation()) {
-                        mAuth.createUserWithEmailAndPassword(etEmail.getText().toString().trim(), etPassword.getText().toString().trim())
-                                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-                                        if (!task.isSuccessful()) {
-                                            Toast.makeText(getActivity(), "Ops, \n user with such data can not be registration \n maybe such user already registered", Toast.LENGTH_LONG).show();
-                                        } else {
-                                            localHelper.writeNewUserApp(getUserApp());
-                                            restartApp();
-                                        }
-                                    }
-                                });
+
+                        FirebaseDatabase.getInstance().getReference().child(getActivity().getResources().getString(R.string.branch_users)).child(etEmail.getText().toString().replace(".", "~")).child("personal data").setValue(getUserApp());
+                        FirebaseDatabase.getInstance().getReference().addValueEventListener(listener);
                     } else {
-                        Toast.makeText(getActivity(), "Ops, \n please verify your data \n and try again or close application", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.msg_no_correct_fields), Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(getActivity(), "Ops, \n please verify your connection to internet \n and try again or close application", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.msg_no_connection), Toast.LENGTH_LONG).show();
                 }
             }
         });
+
         return view;
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
+    public void onStop() {
+        super.onStop();
+        FirebaseDatabase.getInstance().getReference().removeEventListener(listener);
     }
 
     private void restartApp() {
@@ -124,8 +134,6 @@ public class FragmentSignUp extends Fragment {
         PendingIntent mPendingIntent = PendingIntent.getActivity(getActivity(), mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager mgr = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-//        mStartActivity.setFlags(mStartActivity.FLAG_ACTIVITY_CLEAR_TASK);
-//        mStartActivity.addFlags(mStartActivity.FLAG_ACTIVITY_NEW_TASK);
         System.exit(0);
 
     }
@@ -133,11 +141,11 @@ public class FragmentSignUp extends Fragment {
 
     private UserApp getUserApp() {
         UserApp result = new UserApp();
-        result.setName(etName.getText().toString());
-        result.setSurname(etSurname.getText().toString());
-        result.setPhone(etPhone.getText().toString());
-        result.setEmail(etEmail.getText().toString());
-        result.setPassword(etPassword.getText().toString());
+        result.setName(etName.getText().toString().trim());
+        result.setSurname(etSurname.getText().toString().trim());
+        result.setPhone(etPhone.getText().toString().trim());
+        result.setEmail(etEmail.getText().toString().trim());
+        result.setPassword(etPassword.getText().toString().trim());
         return result;
     }
 
@@ -152,20 +160,15 @@ public class FragmentSignUp extends Fragment {
                 (etPassword.getText().toString().equals(etConfPassword.getText().toString()))) {
             result = true;
         } else {
-            Toast.makeText(getActivity(), "ops!!! \n check your field and try again", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.msg_no_correct_fields), Toast.LENGTH_SHORT).show();
             result = false;
         }
         return result;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-//        Log.i(TAG, "call method stop in fragmentSignIn");
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
+    private boolean isAccessToInternet(Context context) {
+        NetworkInfo info = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        return (info == null ? false : info.isConnectedOrConnecting());
     }
 }
-
 

@@ -1,43 +1,35 @@
 {
   "project_info": {
-    "project_number": "823922795291",
-    "firebase_url": "https://help-master.firebaseio.com",
-    "project_id": "help-master",
-    "storage_bucket": "help-master.appspot.com"
+    "project_number": "1040018505882",
+    "firebase_url": "https://help-master-007.firebaseio.com",
+    "project_id": "help-master-007",
+    "storage_bucket": "help-master-007.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:823922795291:android:c02ac55a2a417fd5",
+        "mobilesdk_app_id": "1:1040018505882:android:c02ac55a2a417fd5",
         "android_client_info": {
           "package_name": "chevalier.vladimir.gmail.com.helpmaster"
         }
       },
       "oauth_client": [
         {
-          "client_id": "823922795291-qi6aobphu83ipr037ktig62ve5crl6os.apps.googleusercontent.com",
+          "client_id": "1040018505882-jf2981tbdjjtr6flortat8ds3la31cgs.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "chevalier.vladimir.gmail.com.helpmaster",
-            "certificate_hash": "85e594dddec8a113bf2d826c694a94e8a61081de"
+            "certificate_hash": "ae4c94b788a45c100b019fc6d8eb2d5bc36ce7c6"
           }
         },
         {
-          "client_id": "823922795291-v5t8rfukg7umdhgv5ende5goa3l0ikgi.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "chevalier.vladimir.gmail.com.helpmaster",
-            "certificate_hash": "35b60e5054d168ecec407f47ef0a7e294257f206"
-          }
-        },
-        {
-          "client_id": "823922795291-tkvr8kt2okh57tk0uaaiarl56h54dfjs.apps.googleusercontent.com",
+          "client_id": "1040018505882-2frasdngp1bpiqd4cde711i5rjo1aa6a.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBisOb5fw3u1Mo8gZjQhvCFe_GKpNQ3NXQ"
+          "current_key": "AIzaSyA83v2V6GvDl2Aw1qvU8AVVoecL-9xlDYc"
         }
       ],
       "services": {
@@ -48,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "823922795291-tkvr8kt2okh57tk0uaaiarl56h54dfjs.apps.googleusercontent.com",
+              "client_id": "1040018505882-2frasdngp1bpiqd4cde711i5rjo1aa6a.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
